@@ -1,0 +1,245 @@
+{%-extends "base.html"-%}
+
+{%-block head-%}
+{%-endblock-%}
+
+{%-block content-%}
+<style>
+    .cover {
+        background-repeat: no-repeat;
+        background-size: cover;
+   }
+</style>
+
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-6 m-0 p-4">
+        <div class="row m-0 p-4 bg-light rounded-4">
+            <div class="col-12 mb-4 text-center">
+                <h5>{{ page_title.title() }}</h5>
+            </div>
+            <form class="col-12" onsubmit="searchURL(); return false;">
+                <div class="input-group">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-link"></i></span>
+                    <input name="get-link" class="form-control text-center" type="text" placeholder="Get link" autocomplete="off" required>
+                    <button type="submit" class="btn btn-info text-white" text-white>Get</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if items %}
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-12 m-0 p-4 pt-0">
+        <div class="row m-0 p-4 bg-light rounded-top-4 justify-content-center">
+            <!-- <div class="col-lg-4 mb-4 text-center">
+                <div class="input-group">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-funnel"></i></span>
+                    <input type="text" class="form-control text-center" onkeyup="filterItems(this)" placeholder="Filter by key">
+                </div>
+            </div>
+            <div class="w-100"></div> -->
+
+            <div class="col-lg-4"></div>
+            <div id="pagination-1" class="col-lg-4 text-center">
+                <a href="?page=1" class="btn btn-sm btn-info text-white"><i class="bi bi-chevron-double-left"></i></a>
+                {% if page > 1 %}
+                <a href="?page={{ page - 1}}" class="btn btn-sm btn-info text-white"><i class="bi bi-chevron-left"></i></a>
+                {% endif %}
+                {% if total_pages > 1 %}
+                    {% set start_page = 1 %}
+                    {% set end_page = total_pages %}
+                    {% if total_pages > 3 %}
+                        {% if page <= 2 %}
+                            {% set end_page = 3 %}
+                        {% elif page >= total_pages - 1 %}
+                            {% set start_page = total_pages - 2 %}
+                        {% else %}
+                            {% set start_page = page - 1 %}
+                            {% set end_page = page + 1 %}
+                        {% endif %}
+                        {% if start_page > 1 %}
+                            <a href="?page=1" class="btn btn-sm btn-info text-white">1</a>
+                            {% if start_page > 2 %}<span>...</span>{% endif %}
+                        {% endif %}
+                        {% for p in range(start_page, end_page + 1) %}
+                            {% if p == page %}
+                                <div class="btn btn-sm btn-secondary text-white">{{ p }}</div>
+                            {% else %}
+                                <a href="?page={{ p }}" class="btn btn-sm btn-info text-white">{{ p }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if end_page < total_pages %}
+                            {% if end_page < total_pages - 1 %}<span>...</span>{% endif %}
+                            <a href="?page={{ total_pages }}" class="btn btn-sm btn-info text-white">{{ total_pages }}</a>
+                        {% endif %}
+                    {% else %}
+                        {% for p in range(1, total_pages + 1) %}
+                            {% if p == page %}
+                                <div class="btn btn-sm btn-secondary text-white">{{ p }}</div>
+                            {% else %}
+                                <a href="?page={{ p }}" class="btn btn-sm btn-info text-white">{{ p }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endif %}
+                {% if not is_last_page %}
+                    <a href="?page={{ page + 1}}" class="btn btn-sm btn-info text-white"><i class="bi bi-chevron-right"></i></a>
+                {% endif %}
+                <a href="?page={{ total_pages }}" class="btn btn-sm btn-info text-white"><i class="bi bi-chevron-double-right"></i></a>
+            </div>
+        
+        <div class="col-lg-4">
+            <div class="text-end">
+                <button class="btn btn-sm btn-info text-white" onclick="incrementColsLG()"><i class="bi bi-zoom-out"></i></button>
+                <button class="btn btn-sm btn-info text-white" onclick="decrementColsLG()"><i class="bi bi-zoom-in"></i></button>
+            </div>
+        </div>
+
+
+    </div>
+        <div id="library" class="row row-cols-1 row-cols-lg-4 m-0 p-4 bg-light justify-content-center">
+            {%-for item in items-%}
+            {%-set item_title = item.title if item.title else ''-%}
+            {%-set item_tags = item.tags if item.tags else ''-%}
+            {%-set item_description = item.description if item.description else ''-%}
+            {%-set item_poster = url_for('static',filename=item.poster if item.poster else 'img/img_404.jpg')-%}
+            {%-set item_icon = url_for('static',filename= item.icon if item.icon else 'img/icon_404.png')-%}
+            {%-set item_search = item_title.replace("'", "")-%}
+            <div class="col py-2 d-flex text-center justify-content-center" tags="{{(item_tags+item_title).lower()+item_description.lower()}}">
+                <div class="card border-0 w-100">
+                    <a class="ratio ratio-16x9 cover position-relative" href="{{item.url}}" target="_blank" style="background-image:url('{{item_poster}}');">
+                        {%-if item.favorite == 1-%}
+                        {%-set color = 'warning'-%}
+                        {%-set icon = 'bi-bookmark-fill'-%}
+                        {%-else-%}
+                        {%-set color = 'light'-%}
+                        {%-set icon = 'bi-bookmark'-%}
+                        {%-endif-%}
+                        <a class="btn btn-{{color}} position-absolute top-0 end-0 m-2 p-1" onclick="actionFavorite(this,'{{item.user_id}}','{{item.item_hash}}')"><i class="bi {{icon}}"></i></a>
+                    </a>
+                    <div class="card-body h-100">
+                        <p class="card-title"><img src="{{item_icon}}" width="16"></p>
+                        <p class="card-text text-secondary lh-sm">{{item_title.title()}}</p>
+                    </div>
+                    <div class="card-body p-0 pb-2">
+                        <button class="btn btn-light" onclick="actionSearchWeb('{{item_search}}')"><p><img src="{{url_for('static',filename='img/duckduckgo.svg')}}" width="16"> Search more</p></button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="btn-group mr-2 w-100 " role="group">
+                            <button class="btn btn-info text-white py-3" onclick="actionDelete('{{item.user_id}}','{{item.item_hash}}')" data-bs-toggle="tooltip" data-bs-title="Delete"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-info text-white py-3" onclick="actionEdit('{{item.url}}')" data-bs-toggle="tooltip" data-bs-title="Edit"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-info text-white py-3" onclick="actionGoTo('{{item.url}}')" data-bs-toggle="tooltip" data-bs-title="Go To"><i class="bi bi-play-fill"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {%-endfor-%}
+        </div>
+        <div class="row m-0 p-4 bg-light rounded-bottom-4">
+            <div id="pagination-2" class="col-12 text-center">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pagination1 = document.getElementById('pagination-1');
+    const pagination2 = document.getElementById('pagination-2');
+    pagination2.innerHTML = pagination1.innerHTML;
+</script>
+{% endif %}
+{%-endblock-%}
+
+{%-block footer-%}
+<script>
+    function searchURL() {
+        $('#overlay').show()
+        window.location = '{{url_for("search")}}?url=' + document.querySelector('input[name="get-link"]').value;
+    }
+
+    function actionFavorite(element, id, hash) {
+        fetch(`{{url_for("favorite")}}?user_id=${id}&hash=${hash}`, { method:'GET' })
+        .then(response => {
+            if (!response.ok) { sendAlert(`Network response: ${response.text()}`, 'danger'); return null;}
+            else { return response.text();}
+        })
+        .then(data => {
+            if (data == "1") {
+                let icon = element.querySelector('i');
+                if (element.classList.contains('btn-light')) {
+                    element.classList.remove('btn-light');
+                    element.classList.add('btn-warning');
+                    icon.classList.remove('bi-bookmark');
+                    icon.classList.add('bi-bookmark-fill');
+                } else {
+                    element.classList.remove('btn-warning');
+                    element.classList.add('btn-light');
+                    icon.classList.remove('bi-bookmark-fill');
+                    icon.classList.add('bi-bookmark');
+                }
+            }
+        })
+    }
+
+    function actionDelete(id, hash) {
+        if ( confirm("are you shure you want to delete your link?") ) {
+            $('#overlay').show()
+            window.location = `{{url_for('delete', user_id='id', item_hash='hash')}}`.replace("id", id).replace("hash", hash);
+        }
+    }
+    function actionEdit(url) {
+        $('#overlay').show()
+        window.location = `{{url_for('search')}}?url=${url}`
+    }
+    function actionGoTo(url) {
+        window.open(url, '_blank').focus();
+    }
+
+    function actionSearchWeb(value){
+        let url = `https://duckduckgo.com/?q=${encodeURIComponent(value)}`
+        window.open(url, '_blank').focus();
+    }
+
+    function filterItems(element) {
+        let filter = element.value.toLowerCase()
+        let tags = document.querySelectorAll('[tags]');
+        tags.forEach(tag => {
+            let tagValue = tag.getAttribute('tags');
+            if (tagValue.includes(filter)) {
+                tag.classList.remove('d-none');
+            } else {
+                tag.classList.add('d-none');
+            }
+        });
+    }
+
+
+
+
+    var currentColsLG = 4; // Initial value of N
+    var minColsLG = 1; // Minimum value of N
+    var maxColsLG = 6; // Maximum value of N
+
+function updateRowColsLG(n) {
+    var element = document.getElementById('library');
+    // Remove any existing row-cols-lg-* classes
+    element.className = element.className.replace(/row-cols-lg-\d+/, '');
+    // Add the new row-cols-lg-N class
+    element.classList.add('row-cols-lg-' + n);
+    currentColsLG = n; // Update current value of N
+}
+
+function decrementColsLG() {
+    if (currentColsLG > minColsLG) {
+        updateRowColsLG(currentColsLG - 1);
+    }
+}
+
+function incrementColsLG() {
+    if (currentColsLG < maxColsLG) {
+        updateRowColsLG(currentColsLG + 1);
+    }
+}
+</script>
+{%-endblock-%}

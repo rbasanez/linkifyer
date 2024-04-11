@@ -1,0 +1,84 @@
+{%-extends "base.html"-%}
+
+{%-block head-%}
+{%-endblock-%}
+
+{%-block content-%}
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-6 m-0 p-4">
+        <div class="row m-0 p-4 bg-light rounded-4">
+            <div class="col-12 mb-4 text-center">
+                <h5>{{ page_title.title() }}</h5>
+            </div>
+            <form class="col-12" action="" onsubmit="saveData(); return false;">
+                <div class="mb-2 text-center">
+                    {%-set item_poster = 'data:image/jpg;base64,' + item.poster if item.poster else url_for('static', filename='img/img_404.jpg')-%}
+                    <img class="img-fluid rounded" src="{{item_poster}}" alt="">
+                </div>
+                <div class="input-group my-2" data-bs-toggle="tooltip" data-bs-title="Link URL">
+                    {%-set item_icon = 'data:image/png;base64,' + item.icon if item.icon else url_for('static', filename='img/icon_404.png')-%}
+                    <span class="input-group-text bg-dark text-white border-0"><img src="{{item_icon}}" width="16"></span>
+                    <div class="form-control form-control-sm">{{item.url}}</div>
+                </div>
+                    <!-- <div class="input-group my-2" data-bs-toggle="tooltip" data-bs-title="Link Hash">
+                        <span class="input-group-text bg-info text-white border-0"><i class="bi bi-key"></i></span>
+                        <div class="form-control form-control-sm">{{item.item_hash}}</div>
+                    </div> -->
+                <div class="input-group my-2" data-bs-toggle="tooltip" data-bs-title="Title (editable)">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-chat-square"></i></span>
+                    <input name="title" type="text" class="form-control form-control-sm" value="{{item.title}}">
+                </div>
+                <div class="input-group my-2" data-bs-toggle="tooltip" data-bs-title="Tags (editable)">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-hash"></i></span>
+                    <textarea name="tags" type="text" class="form-control form-control-sm" style="resize: none;">{{item.tags}}</textarea>
+                </div>
+                <div class="input-group my-2" data-bs-toggle="tooltip" data-bs-title="Description (editable)">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-card-text"></i></span>
+                    <textarea name="description" type="text" class="form-control form-control-sm" style="resize: none;">{{item.description}}</textarea>
+                </div>
+                <div class="d-grid mt-2">
+                    <button type="submit" class="btn btn-info text-white" text-white>Save</button>
+                </div>
+                <div class="text-center"><span id="error" class="mt-2 text-danger"></span></div>
+            </form>
+        </div>
+    </div>
+</div>
+{%-endblock-%}
+
+{%-block footer-%}
+<script>
+    function saveData() {
+        $("#overlay").show()
+        let error = document.getElementById('error');
+        let formData = new FormData();
+
+        let title = document.querySelector('input[name="title"]').value.trim();
+        let tags = document.querySelector('textarea[name="tags"]').value.trim();
+        let description = document.querySelector('textarea[name="description"]').value.trim();
+
+        formData.append('title', title);
+        formData.append('tags', tags);
+        formData.append('description', description);
+
+        fetch('{{url_for("save")}}', { method:'POST', body:formData })
+        .then(response => {
+            if (!response.ok) { error.innerHTML = `Network response: ${response.text()}`; }
+            return response.text();
+            $("#overlay").hide()
+        })
+        .then(data => {
+            if (data == "True") {
+                window.location = '{{url_for("library")}}';
+            } else {
+                error.innerHTML = `Something went wrong, check the logs`;
+                $("#overlay").hide()
+            }
+        })
+        .catch(err => {
+            error.innerHTML = `There was a problem with the fetch operation: ${err}`;
+            $("#overlay").hide()
+        });
+    }
+</script>
+{%-endblock-%}
