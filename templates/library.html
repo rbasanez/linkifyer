@@ -1,0 +1,146 @@
+{%-extends "base.html"-%}
+
+{%-block head-%}
+{%-endblock-%}
+
+{%-block content-%}
+<style>
+    .cover {
+        background-repeat: no-repeat;
+        background-size: cover;
+   }
+</style>
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-6 m-0 p-4">
+        <div class="row m-0 p-4 bg-light rounded-4">
+            <div class="col-12 mb-4 text-center">
+                <h5>{{ page_title.title() }}</h5>
+            </div>
+            <form class="col-12" onsubmit="searchURL(); return false;">
+                <div class="input-group">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-link"></i></span>
+                    <input name="get-link" class="form-control text-center" type="text" placeholder="Get link" autocomplete="off" required>
+                    <button type="submit" class="btn btn-info text-white" text-white>Get</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-12 m-0 p-4 pt-0">
+        <div class="row m-0 p-4 pb-0 bg-light rounded-top-4 justify-content-center">
+            <div class="col-lg-4 mb-4 text-center">
+                <form class="input-group" id="filter-form">
+                    <input id="filter-input" type="text" class="form-control text-center" placeholder="Search">
+                    <button type="submit" class="btn btn-info text-white border-0"><i class="bi bi-funnel"></i></button>
+                </form>
+            </div>
+            <div class="col-lg-12 mb-2" >
+                <div class="text-center" id="pagination-1"></div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="text-end">
+                    <button class="btn btn-sm btn-info text-white" onclick="incrementColsLG()"><i class="bi bi-zoom-out"></i></button>
+                    <button class="btn btn-sm btn-info text-white" onclick="decrementColsLG()"><i class="bi bi-zoom-in"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="library" class="row row-cols-1 row-cols-lg-4 m-0 p-4 pt-2 bg-light justify-content-center"></div>
+        <div class="row m-0 p-4 bg-light rounded-bottom-4">
+            <div id="pagination-2" class="col-12 text-center">
+            </div>
+        </div>
+    </div>
+</div>
+{%-endblock-%}
+
+{%-block footer-%}
+<script>const static = `{{url_for('static',filename='')}}`;</script>
+<script src="{{url_for('static', filename='js/library.js')}}"></script>
+<script src="{{url_for('static', filename='js/size_control.js')}}"></script>
+
+<script>
+    loadData('{{url_for("all_items")}}');
+
+
+
+
+    function searchURL() {
+        $('#overlay').show()
+        window.location = '{{url_for("search")}}?url=' + document.querySelector('input[name="get-link"]').value;
+    }
+
+    function actionFavorite(element, id) {
+        fetch(`{{url_for("favorite")}}?item_id=${id}`, { method:'GET' })
+        .then(response => {
+            if (!response.ok) { sendAlert(`Network response: ${response.text()}`, 'danger'); return null;}
+            else { return response.text();}
+        })
+        .then(data => {
+            if (data == "1") {
+                let icon = element.querySelector('i');
+                if (element.classList.contains('btn-light')) {
+                    element.classList.remove('btn-light');
+                    element.classList.add('btn-warning');
+                    icon.classList.remove('bi-bookmark');
+                    icon.classList.add('bi-bookmark-fill');
+                } else {
+                    element.classList.remove('btn-warning');
+                    element.classList.add('btn-light');
+                    icon.classList.remove('bi-bookmark-fill');
+                    icon.classList.add('bi-bookmark');
+                }
+            }
+        })
+    }
+
+    async function actionDelete(id) {
+        if ( confirm("are you shure you want to delete your link?") ) {
+            const response = await fetch(`{{url_for('delete')}}/${id}`);
+            result = await response.text();
+            if ( result == 1 ) {
+                console.log(result)
+                let filter = libraryData.filter( item => item.item_id != id );
+                libraryData = filter
+                console.log(libraryData)
+                filterData()
+            }
+        }
+    }
+    function actionEdit(url) {
+        $('#overlay').show()
+        window.location = `{{url_for('search')}}?url=${url}`
+    }
+    function actionGoTo(url) {
+        window.open(url, '_blank').focus();
+    }
+
+    function actionSearchWeb(value){
+        let url = `https://duckduckgo.com/?q=${encodeURIComponent(value)}`
+        window.open(url, '_blank').focus();
+    }
+
+    function filterItems(element) {
+        let filter = element.value.toLowerCase()
+        let tags = document.querySelectorAll('[tags]');
+        tags.forEach(tag => {
+            let tagValue = tag.getAttribute('tags');
+            if (tagValue.includes(filter)) {
+                tag.classList.remove('d-none');
+            } else {
+                tag.classList.add('d-none');
+            }
+        });
+    }
+
+
+
+
+
+
+
+</script>
+{%-endblock-%}

@@ -1,0 +1,32 @@
+{%-extends "base.html"-%}
+
+{%-block head-%}
+{%-endblock-%}
+
+{%-block content-%}
+<div class="row m-0 p-0 justify-content-center w-100">
+    <div class="col-lg-6 m-0 p-4">
+        <div class="row m-0 p-4 bg-light rounded-4">
+            <div class="col-12 mb-4 text-center">
+                <h5>{{ page_title.title() }}</h5>
+            </div>
+            <form class="col-12" onsubmit="searchURL(); return false;">
+                <div class="input-group">
+                    <span class="input-group-text bg-info text-white border-0"><i class="bi bi-link"></i></span>
+                    <input name="url" class="form-control text-center" type="text" placeholder="Get link" autocomplete="off" required>
+                    <button type="submit" class="btn btn-info text-white" text-white>Get</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{%-endblock-%}
+
+{%-block footer-%}
+<script>
+    function searchURL() {
+        $('#overlay').show()
+        window.location = '{{url_for("search")}}?url=' + document.querySelector('input[name="url"]').value;
+    }
+</script>
+{%-endblock-%}

@@ -1,0 +1,16 @@
+# python cache
+__pycache__/
+*.py[cod]
+
+# distribution
+static/user
+
+# database
+*.db
+
+# logs
+*.log
+
+# Installer
+install.bat
+app.version
