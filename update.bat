@@ -89,12 +89,13 @@ robocopy "!extracted_folder!" "!target_path!" /E /MOVE /NFL /NDL
 
 call :log.info "update current version..."
 echo %latest_version%>"%version_file%"
-goto :end
 
-:end
 if exist "%root_path%temp.json" del /q "%root_path%temp.json"
 if exist "%extracted_folder%" rmdir /s /q "%extracted_folder%"
 if exist "%zip_path%" del /q "%zip_path%"
+goto :end
+
+:end
 pause
 exit
 
