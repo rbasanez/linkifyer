@@ -19,7 +19,9 @@ By running the Linkifyer application, you agree to assume sole responsibility fo
 
 ## Installation and Usage
 
-Getting started with Linkifyer is a breeze! Simply double-click `linkifyer.exe` to launch the application, or go to [http://localhost:9191](http://localhost:9191) in your web browser to access the local server.
+Getting started with Linkifyer is a breeze!
+- Simply double-click `start.bat` to launch the application.
+- Go to [http://localhost:9191](http://localhost:9191) in your web browser to access the local server.
 
 ## How to Use Linkifyer
 
