@@ -54,7 +54,7 @@ if "%latest_version%" == "%current_version%" (
 )
 
 :: Function to download and replace repository
-set url_download=https://codeload.github.com/%owner%/%repo%/zip/refs/tags/v%latest_version%
+set url_download=https://codeload.github.com/%owner%/%repo%/zip/refs/tags/%latest_version%
 set zip_path=%root_path%%repo%-%latest_version%.zip
 set extracted_folder=%root_path%%repo%-%latest_version%
 
@@ -90,9 +90,20 @@ robocopy "!extracted_folder!" "!target_path!" /E /MOVE /NFL /NDL
 call :log.info "update current version..."
 echo %latest_version%>"%version_file%"
 
-if exist "%root_path%temp.json" del /q "%root_path%temp.json"
-if exist "%extracted_folder%" rmdir /s /q "%extracted_folder%"
-if exist "%zip_path%" del /q "%zip_path%"
+rem Check if temp.json exists and delete it if it does
+if exist "%root_path%temp.json" (
+    del /q "%root_path%temp.json"
+)
+
+rem Check if the extracted folder exists and remove it if it does
+if exist "%extracted_folder%" (
+    rmdir /s /q "%extracted_folder%"
+)
+
+rem Check if the zip file exists and delete it if it does
+if exist "%zip_path%" (
+    del /q "%zip_path%"
+)
 goto :end
 
 :end
