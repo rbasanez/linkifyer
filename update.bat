@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 :: Define variables
 set root_path=%~dp0
 set owner=rbasanez
-set repo=Linkifyer
+set repo=linkifyer
 set version_file=%root_path%app.version
 
 :: Function to get latest release

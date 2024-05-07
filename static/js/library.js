@@ -5,7 +5,6 @@ var currentPage = 1;
 var paginationSize = 4
 
 
-
 async function loadData(url) {
     const response = await fetch(url);
     libraryData = await response.json();
@@ -122,53 +121,41 @@ function displayItems(pageNumber) {
         var itemSearch = itemTitle.replace("'", "");
 
         var div = document.createElement('div');
-        div.setAttribute('class', 'col py-2 d-flex text-center justify-content-center');
+        div.setAttribute('class', 'col d-flex mb-4 text-center justify-content-center');
         div.setAttribute('tags', (itemTags + itemTitle).toLowerCase() + itemDescription.toLowerCase());
         div.innerHTML = `
             <div class="card border-0 w-100">
-                <a class="ratio ratio-16x9 cover position-relative" href="${item.url}" target="_blank" style="background-image:url('${itemPoster}');">
-                    ${item.favorite == 1 ? `<a class="btn btn-warning position-absolute top-0 end-0 m-2 p-1" onclick="actionFavorite(this, ${item.item_id})"><i class="bi bi-bookmark-fill"></i></a>` : `<a class="btn btn-light position-absolute top-0 end-0 m-2 p-1" onclick="actionFavorite(this, ${item.item_id})"><i class="bi bi-bookmark"></i></a>`}
+                <a class="ratio ratio-16x9 cover position-relative rounded-top" href="${item.url}" target="_blank" style="background-image:url('${itemPoster}');" data-bs-toggle="tooltip-lib" data-bs-placement="bottom" data-bs-title="Go to URL">
+                    <a class="btn position-absolute top-0 end-0 m-2 p-1" onclick="actionFavorite(this, ${item.item_id})"><i class="${item.favorite == 1 ? `bi bi-bookmark-fill` : `bi bi-bookmark` }"></i></a>
                 </a>
                 <div class="card-body h-100">
                     <p class="card-title"><img src="${itemIcon}" width="16"></p>
-                    <p class="card-text text-secondary lh-sm">${itemTitle}</p>
+                    <p class="card-text text-capitalize text-secondary lh-sm" data-bs-toggle="tooltip-lib" data-bs-title="${itemTitle.toLowerCase()}">${getTrimmedText(itemTitle, 50).toLowerCase()}</p>
                 </div>
-                <div class="card-body p-0 pb-2">
+                <!-- <div class="card-body p-0 pb-2">
                     <button class="btn btn-light" onclick="actionSearchWeb('${itemSearch}')"><p><img src="static/img/duckduckgo.svg" width="16"> Search more</p></button>
-                </div>
+                </div> -->
                 <div class="card-body p-0">
                     <div class="btn-group mr-2 w-100 " role="group">
-                        <button class="btn btn-info text-white py-3" onclick="actionDelete('${item.item_id}')" data-bs-toggle="tooltip" data-bs-title="Delete"><i class="bi bi-trash"></i></button>
-                        <button class="btn btn-info text-white py-3" onclick="actionEdit('${item.url}')" data-bs-toggle="tooltip" data-bs-title="Edit"><i class="bi bi-pencil-square"></i></button>
-                        <button class="btn btn-info text-white py-3" onclick="actionGoTo('${item.url}')" data-bs-toggle="tooltip" data-bs-title="Go To"><i class="bi bi-play-fill"></i></button>
+                        <button class="btn btn-info text-white py-3" onclick="actionDelete('${item.item_id}')" data-bs-toggle="tooltip-lib" data-bs-title="Delete"><i class="bi bi-trash"></i></button>
+                        <button class="btn btn-info text-white py-3" onclick="actionEdit('${item.url}')" data-bs-toggle="tooltip-lib" data-bs-title="Edit"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-info text-white py-3" onclick="actionGoTo('${item.url}')" data-bs-toggle="tooltip-lib" data-bs-title="Go to URL"><i class="bi bi-play-fill"></i></button>
                     </div>
                 </div>
             </div>
         `;
         itemsContainer.appendChild(div);
     });
+    const tooltipLibTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip-lib"]')
+    const tooltipLibList = [...tooltipLibTriggerList].map(element => new bootstrap.Tooltip(element))
 }
 
-function actionFavorite(element, id, hash) {
-    fetch(`{{url_for("favorite")}}?item_id=${id}`, { method: 'GET' })
-        .then(response => {
-            if (!response.ok) { sendAlert(`Network response: ${response.text()}`, 'danger'); return null; }
-            else { return response.text(); }
-        })
-        .then(data => {
-            if (data == "1") {
-                let icon = element.querySelector('i');
-                if (element.classList.contains('btn-light')) {
-                    element.classList.remove('btn-light');
-                    element.classList.add('btn-warning');
-                    icon.classList.remove('bi-bookmark');
-                    icon.classList.add('bi-bookmark-fill');
-                } else {
-                    element.classList.remove('btn-warning');
-                    element.classList.add('btn-light');
-                    icon.classList.remove('bi-bookmark-fill');
-                    icon.classList.add('bi-bookmark');
-                }
-            }
-        });
-}
+
+
+const getTrimmedText = (text, max_lenght) => {
+    if (text.length > max_lenght) {
+        return text.substring(0, max_lenght).trimEnd() + '...';
+    } else {
+        return text;
+    }
+};

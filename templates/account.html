@@ -1,0 +1,80 @@
+{%-extends "base.html"-%}
+
+{%-block head-%}
+{%-endblock-%}
+
+{%-block content-%}
+<div class="row g-3 m-0 p-4 justify-content-center w-100">
+    <div class="col-lg-12">
+        <p class="fs-5 text-uppercase text-secondary text-center">Account</p>
+    </div>
+    <div class="w-100"></div>
+    <form class="col-6" onsubmit="updateUsername(this); return false;">
+        <label class="mb-2">Change username:</label>
+        <div class="input-group mb-2">
+            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+            <input name="username" class="form-control" type="text" placeholder="New username" required>
+        </div>
+        <div class="d-grid text-center">
+            <button type="submit" class="btn">Update</button>
+        </div>
+    </form>
+
+    <div class="w-100 my-4"></div>
+
+    <form class="col-6" onsubmit="updatePassword(this); return false">
+        <label class="mb-2">Change password:</label>
+        <div class="input-group mb-4">
+            <span class="input-group-text"><i class="bi bi-key"></i></span>
+            <input name="password" class="form-control" type="password" placeholder="New password" required>
+        </div>
+        <div class="input-group mb-4 justify-content-center">
+            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+            <input name="password2" class="form-control" type="password" placeholder="Confirm Password" onkeyup="validatePassword()" required>
+            <div class="w-100"></div>
+            <div id="pass2-notice" class="text-danger" hidden>Passwords doesn't match</div>
+        </div>
+        <div class="d-grid text-center">
+            <button type="submit" class="btn">Update Password</button>
+        </div>
+    </form>
+</div>
+{%-endblock-%}
+
+{%-block footer-%}
+<script>
+
+    async function updateUsername(element) {
+        let url = `{{url_for('user.update_username')}}`
+        let response = await fetch(url, {method:'POST', body:new FormData(element)});
+        let data = await response.text();
+        console.log(data)
+    }
+
+
+
+
+
+
+    var pass1 = document.querySelector('input[name="password"]');
+    var pass2 = document.querySelector('input[name="password2"]');
+    var pass2_notice = document.getElementById('pass2-notice');
+    function validatePassword() {
+        if ( pass1.value === pass2.value ) {
+            pass2_notice.hidden = true;
+            return true;
+        } else {
+            pass2_notice.hidden = false;
+            return false
+        }
+    }
+    async function updatePassword(element) {
+        if ( validatePassword() == true ) {
+            let url = `{{url_for('user.update_password')}}`
+            let response = await fetch(url, {method:'POST', body:new FormData(element)});
+            let data = await response.text();
+            console.log(data)
+        }
+    }
+</script>
+{%-endblock-%}

@@ -4,6 +4,10 @@ __pycache__/
 
 # distribution
 static/user
+dist/
+logs/
+dev/
+session/
 
 # database
 *.db

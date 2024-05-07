@@ -98,6 +98,9 @@ class Item:
             cls._logger.info(f"{cls._method_path()}: start")
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
+            with open('fetched.html', 'wb+') as f:
+                f.write(response.content)
+
             cls._url_head = soup.find('head')
             cls._url_body = soup.find('body')
             cls._logger.info(f"{cls._method_path()}: complete")
@@ -153,7 +156,7 @@ class Item:
     @classmethod
     def _to_string(cls, value):
         conv = lambda i : i or ''
-        return conv(value)
+        return conv(value).replace('"',"'")
     
     @classmethod
     def _hash_string(cls, value):
@@ -352,7 +355,7 @@ class Item:
                 tags.append( tag.text.strip().lower() )
             for tag in self._url_body.select('[class*="tags"] a'):
                 tags.append( tag.text.strip().lower() )
-            tags = sorted(set([ x for x in tags if len(x) > 1 and bool(re.search('edit|tag|model', x)) == False ]))
+            tags = sorted(set([ x for x in tags if len(x) > 1 and bool(re.search('edit|tag|model|suggest', x)) == False ]))
             self.tags = ' '.join(tags)
             self._logger.info(f"{self._method_path()}: {bool(self.tags)}")
             self.tags = self._to_string(self.tags)

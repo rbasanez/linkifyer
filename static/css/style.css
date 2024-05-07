@@ -23,9 +23,32 @@ p,h1,h2,h3,h4,h5,h6 {
     opacity: .50;
 }
 
-.btn-nav-left {
-    border-radius: 0 0 0 .50rem !important;
+/* Style */
+
+:root {
+    --bs-danger-dark: #be2828;
+    --bs-info-dark: #2894be;
 }
-.btn-nav-right {
-    border-radius: 0 0 .50rem 0 !important;
+
+body {
+    background-color: var(--bs-light);
+}
+
+.navigation {
+    background-color: var(--bs-dark);
+}
+
+.form-control:focus{
+    box-shadow: none;
+    border-color: var(--bs-danger);
+}
+
+.input-group-text, .btn {
+    background-color: var(--bs-danger) !important;
+    color: var(--bs-light) !important;
+    border: 0 !important;
+}
+
+.btn:hover {
+    background-color: var(--bs-danger-dark)!important;
 }
