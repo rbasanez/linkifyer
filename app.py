@@ -1,19 +1,36 @@
-from datetime import datetime, timezone # type: ignore
+import argparse
+from datetime import datetime, timezone
+import os
 from flask import Flask, json, jsonify, request, render_template, url_for, flash, redirect
 from flask_login import UserMixin, LoginManager, login_user, login_required, logout_user, current_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import text, func
 from sqlalchemy_serializer import SerializerMixin
-from pathlib import Path # type: ignore
-from urllib.parse import quote  # type: ignore
+from pathlib import Path
+from urllib.parse import quote
 from modules.forms import GetLinkForm, LoginForm, RegisterForm, FetchUrlForm
 from modules.hash import hash_password, validate_passwords
 from modules.item import Item
 from modules.logger import logger
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+
+
+# Parsing command line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--host', type=str, default='localhost', help='Host address (default: localhost)')
+parser.add_argument('--port', type=int, default=9191, help='Port number (default: 9191)')
+parser.add_argument('--prefix', type=str, default='', help='Site Prefix (default: /)')
+parser.add_argument('--https', action='store_true', help='Enable HTTPS (default: HTTP)')
+parser.add_argument('--incognito', action='store_true', help='Open browser in incognito mode')
+parser.add_argument("--dev", action="store_true", help="Run in development mode (debug=True)")
+args = parser.parse_args()
+
+protocol = "https" if args.https else "http"
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{Path(__file__).resolve().parent}/database.db'
 app.config['SECRET_KEY'] = 'b01800a69ae34b80972910eb5ce7a284'
+app.config["APPLICATION_ROOT"] = args.prefix
 
 db = SQLAlchemy(app)
 
@@ -199,7 +216,31 @@ def delete(item_id):
     db.session.commit()
     return str(1)
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# Function to handle simple WSGI requests
+def simple(env, resp):
+    resp('404 Not Found', [('Content-Type', 'text/plain')])
+    return [b'404 Not Found']
 
-exit()
+app.wsgi_app = DispatcherMiddleware(simple, {args.prefix: app.wsgi_app})
+
+if __name__ == "__main__":
+    url = f"{protocol}://{args.host}:{args.port}{args.prefix}"
+    # Open browser in incognito mode if specified
+    if args.incognito:
+        url = f"{protocol}://{args.host}:{args.port}"
+        os.system(f'start chrome.exe -incognito --new-window "{url}"')
+
+    try:
+        if args.dev:
+            # Run the application in development mode
+            app.run(debug=True, host=args.host, port=args.port)
+
+        else:
+            # Run the application using Waitress server
+            from waitress import serve as waitress_serve
+            logger.info(url)
+            waitress_serve(app, host=args.host, port=args.port, url_scheme=protocol, threads=100)
+
+    except Exception as err:
+        logger.error(err)
+        exit(3)
