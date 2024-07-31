@@ -1,0 +1,35 @@
+{%-extends "base.html"-%}
+{%-block head-%}{%-endblock-%}
+{%-block content-%}
+    {%-macro render_field(field)-%}
+        {{ field(**kwargs)|safe }}
+        {%-if field.errors-%}
+            {%-for error in field.errors-%}
+                <div class="w-100 text-danger ps-5">* {{ error }}</div>
+            {%-endfor-%}
+        {%-endif-%}
+    {%-endmacro-%}
+    <div class="row m-0 justify-content-center">
+        <div class="col-lg-6">
+            <form method="POST" onsubmit="submitForm(this);return false;">
+                {{form.hidden_tag()}}
+                <div class="input-group mb-2">
+                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                    {{ render_field(form.username) }}
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    {{ render_field(form.password) }}
+                </div>
+                <div class="input-group mb-2">
+                    <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                    {{ render_field(form.confirm) }}
+                </div>
+                <div class="d-grid">
+                    {{form.submit()}}
+                </div>
+            </form>
+        </div>
+    </div>
+{%-endblock-%}
+{%-block footer-%}{%-endblock-%}
