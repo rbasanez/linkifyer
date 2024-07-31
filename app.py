@@ -17,7 +17,6 @@ app.config['SECRET_KEY'] = 'b01800a69ae34b80972910eb5ce7a284'
 
 db = SQLAlchemy(app)
 
-
 class Users (db.Model, UserMixin):
     id         = db.Column(db.Integer, primary_key=True)
     username   = db.Column(db.String(50), nullable=False, unique=True)
@@ -25,7 +24,6 @@ class Users (db.Model, UserMixin):
     fname      = db.Column(db.String(50), nullable=True)
     lname      = db.Column(db.String(50), nullable=True)
     last_login = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-
 
 class Items (db.Model, SerializerMixin):
     id          = db.Column(db.Integer, primary_key=True)
@@ -48,7 +46,6 @@ item = Item()
 
 with app.app_context():
     db.create_all()
-
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -179,7 +176,6 @@ def destroy():
     db.session.commit()
     return "data destroyed"
 
-
 @app.route('/library', methods=['GET', 'POST'])
 @login_required
 def library():
@@ -194,8 +190,6 @@ def items(id):
         items = Items.query.filter_by(user_id=current_user.id).order_by(text("last_update desc")).all()
     return jsonify([item.to_dict() for item in items])
 
-
-
 @app.route('/delete', methods=['GET'])
 @app.route('/delete/<item_id>', methods=['GET'])
 @login_required
@@ -205,49 +199,7 @@ def delete(item_id):
     db.session.commit()
     return str(1)
 
-
-
-
-
-
-
-
-
-import subprocess
-import sys
-import os
-
-def open_chrome_incognito(url):
-    chrome_path = ""
-    
-    # Determine the platform and set the path to Chrome accordingly
-    if sys.platform == "win32":
-        chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-    elif sys.platform == "darwin":
-        chrome_path = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-    elif sys.platform == "linux" or sys.platform == "linux2":
-        chrome_path = "/usr/bin/google-chrome"
-    else:
-        raise Exception("Unsupported operating system")
-    
-    if not os.path.exists(chrome_path):
-        raise Exception(f"Google Chrome not found at {chrome_path}")
-    
-    # Open Chrome in incognito mode
-    subprocess.run([chrome_path, "--incognito", url])
-
-
-
-
 if __name__ == "__main__":
-    open_chrome_incognito("http://127.0.0.1:5000")
     app.run(debug=True)
-
-
-
-
-
-
-
 
 exit()
