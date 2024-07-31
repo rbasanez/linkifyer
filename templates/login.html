@@ -1,0 +1,40 @@
+{%-extends "base.html"-%}
+{%-block head-%}{%-endblock-%}
+{%-block content-%}
+
+
+    {%-macro render_field(field)-%}
+        <div class="form-floating mb-2">
+            {{ field(**kwargs)|safe }}
+            <label for="{{field.id}}">
+                {%-if field.errors-%}
+                    {%-for error in field.errors-%}
+                        <div class="w-100 text-danger">* {{ error }}</div>
+                    {%-endfor-%}
+                {%-else-%}
+                    {{ field.label.text|safe }}
+                {%-endif-%}
+            </label>
+        </div>
+    {%-endmacro-%}
+
+    <div class="row justify-content-center">
+    <form class="col-lg-4" method="POST" onsubmit="submitForm(this);return false;">
+        {{form.hidden_tag()}}
+        {{ render_field(form.username) }}
+        {{ render_field(form.password) }}
+        <div class="d-grid">
+            <button type="submit" class="btn app-btn">Login</button>
+        </div>
+    </form>
+</div>
+    <script>
+    const myModalAlternative = new bootstrap.Modal('#modal-login', {})
+    // myModalAlternative.show();
+    </script>
+
+
+
+{%-endblock-%}
+{%-block footer-%}
+{%-endblock-%}

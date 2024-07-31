@@ -1,0 +1,148 @@
+{%-extends "base.html"-%}
+{%-block head-%}{%-endblock-%}
+{%-block content-%}
+
+    {%-macro render_field(field)-%}
+        {{ field(**kwargs)|safe }}
+        {%-if field.errors-%}
+            {%-for error in field.errors-%}
+                <div class="w-100 text-danger ps-5">* {{ error }}</div>
+            {%-endfor-%}
+        {%-endif-%}
+    {%-endmacro-%}
+
+    <div class="row m-0 py-4 justify-content-center">
+        <div class="col-lg-auto text-center mb-2 mb-lg-0">
+            <img class="img-fluid rounded" src="{{item.poster}}" style="max-width:600px;max-height:600px;">
+            <p class="text-start"><small><img src="{{item.icon}}" width="16"> <a href="{{item.schema}}://{{item.host}}" target="_blank" class="text-decoration-none">{{item.host}}</small></a></p>
+        </div>
+        <form method="POST" onsubmit="submitFormData(this);return false;" class="col-lg">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.hash) }}
+            {{ render_field(form.poster) }}
+            {{ render_field(form.icon) }}
+            {{ render_field(form.host) }}
+            {{ render_field(form.schema) }}
+            {{ render_field(form.url) }}
+
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Title (editable)">
+                <span class="input-group-text"><i class="bi bi-chat-square"></i></span>
+                {{ render_field(form.title) }}
+            </div>
+
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Description (editable)">
+                <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                {{ render_field(form.description) }}
+            </div>
+
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Tags">
+                <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                <div id="tag-container" class="form-control">
+                    {{ render_field(form.tags) }}
+                </div>
+            </div>
+
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Actors">
+                <span class="input-group-text"><i class="bi bi-people"></i></span>
+                <div id="actor-container" class="form-control">
+                    {{ render_field(form.actors) }}
+                </div>
+            </div>
+
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Collections">
+                <span class="input-group-text"><i class="bi bi-folder"></i></span>
+                <div id="collection-container" class="form-control">
+                    {{ render_field(form.collections) }}
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn app-btn" text-white>Save</button>
+            </div>
+            <div class="text-center"><span id="error" class="mt-2 text-danger"></span></div>
+        </form>
+    </div>
+
+{%-endblock-%}
+{%-block footer-%}
+
+<script>
+
+    const constructBadges = (value, container) => {
+        value.split(',').map( item => {
+            if (item.trim().length > 0) {
+                let span = document.createElement('span')
+                span.setAttribute('class','badge text-bg-danger m-1')
+                span.innerHTML = `
+                    <span class="d-flex align-items-center">
+                        ${item.trim()}
+                        <button class="btn-close ms-1" data-app-delete="badge" onclick="this.parentNode.parentNode.remove();"></button>
+                    </span>`.trim()
+                container.insertBefore(span, container.lastElementChild)
+            }
+        });
+    }
+
+    const clearInput = (elem) => {
+        elem.value = '';
+        elem.setAttribute('value', '');
+        return elem
+    }
+
+    var actors = document.getElementById('actors')
+    var actorContainer = document.getElementById('actor-container')
+    constructBadges(actors.value, actorContainer);
+    actors = clearInput(actors);
+    actors.addEventListener('input', function() {
+        if ( this.value.includes(',') ) {
+            constructBadges(this.value, actorContainer);
+            actors = clearInput(actors);
+        }
+    })
+
+    var tags = document.getElementById('tags')
+    var tagContainer = document.getElementById('tag-container')
+    constructBadges(tags.value, tagContainer);
+    tags = clearInput(tags);
+    tags.addEventListener('input', function() {
+        if ( this.value.includes(',') ) {
+            constructBadges(this.value, tagContainer);
+            tags = clearInput(tags);
+        }
+    })
+
+    var collections = document.getElementById('collections')
+    var collectionContainer = document.getElementById('collection-container')
+    constructBadges(collections.value, collectionContainer);
+    collections = clearInput(collections);
+    collections.addEventListener('input', function() {
+        if ( this.value.includes(',') ) {
+            constructBadges(this.value, collectionContainer);
+            collections = clearInput(collections);
+        }
+    })
+
+    function submitFormData(form) {
+        $("#overlay").show();
+        let tagValue = [...new Set(tagContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
+        tags.value = tagValue;
+        let actorValue = [...new Set(actorContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
+        actors.value = actorValue;
+        let collectionValue = [...new Set(collectionContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
+        collections.value = collectionValue;
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const existingWValue = urlParams.get('w');
+        if (existingWValue) {
+            form.setAttribute('action', `?w=${existingWValue}`);
+        }
+        form.submit();
+    }
+
+
+
+
+</script>
+
+{%-endblock-%}

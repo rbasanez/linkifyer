@@ -1,0 +1,114 @@
+{%-extends "base.html"-%}
+{%-block head-%}
+    <style>
+        .cover {
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .cover a {
+            background-color:rgba(0, 0, 0, 0.5);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+{%-endblock-%}
+
+{%-block content-%}
+    {%-macro render_field(field)-%}
+    <div class="form-floating">
+        {{ field(**kwargs)|safe }}
+        <label for="{{field.id}}">{{ field.label.text|safe }}
+        </label>
+    </div>
+    {%-endmacro-%}
+    <div class="row justify-content-center">
+
+        <div class="col-lg-12 mb-3">
+            <div id="paginationTop" class="input-group m-0 justify-content-center"></div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <form action="{{url_for('fetch')}}?w={{page_title}}" method="GET" onsubmit="submitForm(this);return false;">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-link"></i></span>
+                    {{ render_field(form.link) }}
+                    <button type=submit class="btn app-btn"><i class="bi bi-binoculars-fill"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div class="w-100"></div>
+        <div class="col-lg-6">
+            <div class="input-group">
+                <div class="form-floating force">
+                    <input id="filter-input" type="text" class="form-control" placeholder="">
+                    <label for="filter-input">Filter</label>
+                </div>
+                <div class="form-floating">
+                    <select id="filter-actors" class="form-select">
+                        <option value="" selected></option>
+                    </select>
+                    <label for="ilter-actors">Actors</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div id="items" class="row row-cols-1 row-cols-lg-6 g-3 m-0 justify-content-center">
+            </div>
+        </div>
+        <div class="col-lg-12 mt-3">
+            <div id="paginationBottom" class="input-group justify-content-center"></div>
+        </div>
+    </div>
+{%-endblock-%}
+
+{%-block footer-%}
+    <script>
+        var ITEMS_ALL = [];
+        var ITEMS_FILTERED = [];
+        var ITEMS_PER_PAGE = 24;
+        var PAGE_CURRENT = 1
+        var PAGES_TOTAL = 1;
+    </script>
+    <script src="{{url_for('static', filename='js/library.js')}}"></script>
+    <script>
+
+        let toggleStatus = null;
+        function toggleVisible(status) {
+            if ( toggleStatus == status ) { return; }
+            event.srcElement.firstElementChild.classList.toggle('d-none');
+            toggleStatus = status;
+        }
+
+        async function actionDelete(id) {
+            if ( confirm("are you shure you want to delete your link?") ) {
+                let response = await fetch(`{{url_for('delete')}}/${id}`);
+                result = await response.text();
+                if ( result == 1 ) {
+                    ITEMS_ALL = ITEMS_ALL.filter( item => item.id != id );
+                    ITEMS_FILTERED = ITEMS_ALL;
+                    updatePagination(PAGE_CURRENT);
+                }
+            }
+        }
+
+
+        function actionEdit(id) {
+            $("#overlay").show();
+            window.location = `{{url_for('edit')}}/${id}`;
+        }
+
+        function actionFetch(url) {
+            $("#overlay").show();
+            window.location = `{{url_for('fetch')}}?link=${url}`;
+        }
+
+        function actionGoTo(url) {
+            $("#overlay").show();
+            window.open(url, '_blank');
+        }
+
+
+
+        loadItems(`{{url_for('items', id='all')}}`);
+    </script>
+{%-endblock-%}

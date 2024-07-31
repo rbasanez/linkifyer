@@ -1,0 +1,143 @@
+:root {
+
+    --app-bg: #edf2fa;
+    --app-bg-hover: #e0e5ec;
+    --app-bg-disabled: #cdd2d8;
+    --app-color: #66686c;
+
+
+
+
+    --app-btn-bg: #12a2e3;
+    --app-btn-bg-hover: #0f98d6;
+    --app-btn-color: #edf2fa;
+    --app-btn-color-hover: #edf2fa;
+
+    --app-body-bg: var(--app-bg);
+
+
+    --app-input-focus: #0f98d6;
+
+    --app-nav-bg: var(--app-bg);
+    --app-nav-bg-hover: var(--app-bg-hover);
+    --app-nav-color: var(--app-color);
+
+    --app-btn-bg: var(--app-bg);
+    --app-btn-hover: var(--app-bg-hover);
+    --app-btn-disabled: var(--app-bg-disabled);
+    --app-btn-color: var(--app-color);
+
+
+}
+
+
+@font-face {
+    font-family: "Fira Sans";
+    src: url('fonts/fira/eot/FiraSans-Regular.eot');
+    src: url('fonts/fira/eot/FiraSans-Regular.eot') format('embedded-opentype')
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+p,h1,h2,h3,h4,h5,h6 {
+    padding: 0;
+    margin: 0;
+}
+
+/* #overlay {
+
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    
+} */
+
+
+#overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    width: 100%;
+    display: none;
+    z-index: 1050;
+    background-color: #000000;
+    color: var(--app-overlay-color);
+    opacity: .75;
+}
+
+
+.content-block {
+    max-width: 1920px;
+}
+
+
+
+.app-body {
+    background-color: var(--app-body-bg);
+    color: var(--app-color);
+    font-family: "Montserrat", sans-serif;
+}
+
+.app-nav-btn {
+    background-color: var(--app-nav-bg);
+    color: var(--app-nav-color)
+}
+
+.app-nav-btn:hover {
+    background-color: var(--app-nav-bg-hover);
+    color: var(--app-nav-color)
+}
+
+
+.form-control:focus, .form-select:focus {
+    box-shadow: none;
+    border-color: var(--app-input-focus);
+}
+
+.input-group-text {
+    background-color: var(--app-btn-bg);
+    color:  var(--app-btn-color);
+    border: 0;
+}
+
+.app-title {
+    font-size: 1.25rem !important;
+    text-transform: uppercase !important;
+    color: var(--app-title-color);
+}
+
+
+.app-btn {
+    background-color: var(--app-bg);
+    color: var(--app-nav-color);
+}
+
+.app-btn:hover {
+    background-color: var(--app-bg-hover);
+    color: var(--app-nav-color);
+}
+
+.app-btn:disabled, .app-btn[disabled] {
+    background-color: var(--app-bg-disabled);
+    color: var(--app-nav-color);
+    border: 0;
+}
+
+
+.form-floating.force label {
+    color: rgba(var(--bs-body-color-rgb), .65);
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+}

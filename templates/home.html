@@ -1,0 +1,23 @@
+{%-extends "base.html"-%}
+{%-block head-%}{%-endblock-%}
+{%-block content-%}
+    {%-macro render_field(field)-%}
+    <div class="form-floating">
+        {{ field(**kwargs)|safe }}
+        <label for="{{field.id}}">{{ field.label.text|safe }}
+        </label>
+    </div>
+    {%-endmacro-%}
+    <div class="row m-0 justify-content-center">
+        <div class="col-lg-6">
+            <form action="{{url_for('fetch')}}" method="GET" onsubmit="submitForm(this);return false;">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-link"></i></span>
+                    {{ render_field(form.link) }}
+                    <button type=submit class="btn app-btn"><i class="bi bi-binoculars-fill"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+{%-endblock-%}
+{%-block footer-%}{%-endblock-%}
