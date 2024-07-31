@@ -1,3 +1,3 @@
 @echo off
 
-%~dp0env\Scripts\python.exe %~dp0app.py
+%~dp0env\python.exe %~dp0app.py
