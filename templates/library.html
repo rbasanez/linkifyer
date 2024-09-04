@@ -30,7 +30,7 @@
             <form action="{{url_for('fetch')}}?w={{page_title}}" method="GET" onsubmit="submitForm(this);return false;">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-link"></i></span>
-                    {{ render_field(form.link) }}
+                    {{ render_field(form.url) }}
                     <button type=submit class="btn app-btn"><i class="bi bi-binoculars-fill"></i></button>
                 </div>
             </form>
@@ -44,10 +44,10 @@
                     <label for="filter-input">Filter</label>
                 </div>
                 <div class="form-floating">
-                    <select id="filter-actors" class="form-select">
+                    <select id="filter-model" class="form-select">
                         <option value="" selected></option>
                     </select>
-                    <label for="ilter-actors">Actors</label>
+                    <label for="ilter-model">Models</label>
                 </div>
             </div>
         </div>

@@ -10,8 +10,8 @@ const getTrimmedText = (text, max_lenght) => {
     else { return text; }
 };
 
-const getActors = (actors) => {
-    return actors.map(actor => `<small class="text-primary" onclick="searchByActor('${actor}')" style="cursor:pointer;">${toTitleCase(actor)}</small>`);
+const getModels = (model) => {
+    return model.map(actor => `<small class="text-primary" onclick="searchByModel('${actor}')" style="cursor:pointer;">${toTitleCase(actor)}</small>`);
 };
 
 
@@ -23,7 +23,7 @@ const createCard = (item) => {
     div.setAttribute('class', 'col');
     div.innerHTML = `
         <!-- <a class="btn position-absolute top-0 end-0 m-2 p-1" onclick="actionFavorite(this, ${item.id})"><i class="${item.favorite == 1 ? `bi bi-bookmark-fill` : `bi bi-bookmark` }"></i></a> -->
-        <div id="parent" class="ratio ratio-16x9 cover border" style="background-image:url('${itemPoster}');" onmouseenter="toggleVisible('on')" onmouseleave="toggleVisible('off')">
+        <div id="parent" class="ratio ratio-16x9 cover border" style="background-image:url('${item.poster_path}');" onmouseenter="toggleVisible('on')" onmouseleave="toggleVisible('off')">
             <a href="${item.url}" target="_blank" class="w-100 h-100 p-2 d-flex justify-content-center align-items-center d-none">
                 <p class="text-center">${toTitleCase(getTrimmedText(itemTitle, 60))}</p>
             </a>
@@ -35,9 +35,9 @@ const createCard = (item) => {
             <button class="btn app-btn rounded-top-0" onclick="actionGoTo('${item.url}')" data-bs-toggle="tooltip-lib" data-bs-title="Go to URL"><i class="bi bi-play-fill"></i></button>
         </div>
         <div>
-            <p class="text-start"><small><img src="${itemIcon}" width="16"> <a href="${item.schema}://${item.host}" target="_blank" class="text-decoration-none">${item.host}</small></a></p>
+            <p class="text-start"><small><img src="${item.icon_path}" width="16"> <a href="${item.schema}://${item.host}" target="_blank" class="text-decoration-none">${item.host}</small></a></p>
             <p class="text-center"><small>${toTitleCase(getTrimmedText(itemTitle, 50))}</small></p>
-            <p class="text-center"><small>${getActors(item.actors.split(',')).join(' | ')}</small></p>
+            <p class="text-center"><small>${getModels(item.models.split(',')).join(' | ')}</small></p>
             
         </div>
     `;
@@ -91,23 +91,23 @@ function createPagination() {
     paginationBottom.innerHTML = paginationTop.innerHTML;
 }
 
-function createActorsSelection() {
-    var actorsList = []
-    var filterActors = document.getElementById('filter-actors')
+function createModelsSelection() {
+    var modelList = []
+    var filterModels = document.getElementById('filter-model')
     ITEMS_ALL.slice().forEach( item => {
-        var itemActors = item.actors ? item.actors : ``;
-        if (itemActors.includes(',')) {
-            actorsList = actorsList.concat(itemActors.split(','));
+        var itemModels = item.models ? item.models : ``;
+        if (itemModels.includes(',')) {
+            modelList = modelList.concat(itemModels.split(','));
         } else {
-            actorsList.push(itemActors);
+            modelList.push(itemModels);
         }
     })
-    actorsList = Array.from(new Set(actorsList));
-    actorsList = actorsList.filter(function(actor) { return actor.trim() !== ""; });
-    actorsList.sort();
-    actorsList = actorsList.map(toTitleCase);
-    actorsList.forEach( actorName => {
-        filterActors.innerHTML += `<option value="${actorName.toLowerCase()}">${actorName}</option>`;
+    modelList = Array.from(new Set(modelList));
+    modelList = modelList.filter(function(actor) { return actor.trim() !== ""; });
+    modelList.sort();
+    modelList = modelList.map(toTitleCase);
+    modelList.forEach( actorName => {
+        filterModels.innerHTML += `<option value="${actorName.toLowerCase()}">${actorName}</option>`;
     } );
 }
 
@@ -143,19 +143,19 @@ async function loadItems(url) {
         title: item.title.toLowerCase(),
         tags: item.tags.toLowerCase(),
         description: item.description.toLowerCase(),
-        actors: item.actors.toLowerCase(),
+        model: item.models.toLowerCase(),
         host: item.host.toLowerCase()
       }));
     ITEMS_FILTERED = ITEMS_ALL;
     PAGES_TOTAL = getTotalPages();
     updatePagination(PAGE_CURRENT);
-    createActorsSelection();
+    createModelsSelection();
 }
 
 function filterItems() {
-    let filterActors = document.getElementById('filter-actors').value.toLowerCase();
+    let filterModels = document.getElementById('filter-model').value.toLowerCase();
     let filterInput = document.getElementById('filter-input').value.toLowerCase();
-    ITEMS_FILTERED = ITEMS_ALL.filter(item => item.actors.includes(filterActors));
+    ITEMS_FILTERED = ITEMS_ALL.filter(item => item.model.includes(filterModels));
     ITEMS_FILTERED = ITEMS_FILTERED.filter(item =>
         item.tags.includes(filterInput) ||
         item.title.includes(filterInput) ||
@@ -171,12 +171,12 @@ document.getElementById('filter-input').addEventListener('input', function () {
     timeoutId = setTimeout(filterItems, 500);
 });
 
-document.getElementById('filter-actors').addEventListener('change', function () {
+document.getElementById('filter-model').addEventListener('change', function () {
     filterItems();
 });
 
 
-function searchByActor(actorName) {
-    document.getElementById('filter-actors').value = actorName;
+function searchByModel(actorName) {
+    document.getElementById('filter-model').value = actorName;
     filterItems();
 }

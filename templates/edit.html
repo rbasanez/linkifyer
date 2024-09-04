@@ -42,10 +42,10 @@
                 </div>
             </div>
 
-            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Actors">
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Models">
                 <span class="input-group-text"><i class="bi bi-people"></i></span>
                 <div id="actor-container" class="form-control">
-                    {{ render_field(form.actors) }}
+                    {{ render_field(form.model) }}
                 </div>
             </div>
 
@@ -89,14 +89,14 @@
         return elem
     }
 
-    var actors = document.getElementById('actors')
+    var model = document.getElementById('model')
     var actorContainer = document.getElementById('actor-container')
-    constructBadges(actors.value, actorContainer);
-    actors = clearInput(actors);
-    actors.addEventListener('input', function() {
+    constructBadges(model.value, actorContainer);
+    model = clearInput(model);
+    model.addEventListener('input', function() {
         if ( this.value.includes(',') ) {
             constructBadges(this.value, actorContainer);
-            actors = clearInput(actors);
+            model = clearInput(model);
         }
     })
 
@@ -128,7 +128,7 @@
         let tagValue = [...new Set(tagContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
         tags.value = tagValue;
         let actorValue = [...new Set(actorContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
-        actors.value = actorValue;
+        model.value = actorValue;
         let collectionValue = [...new Set(collectionContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
         collections.value = collectionValue;
         form.submit();

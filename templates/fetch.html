@@ -13,16 +13,17 @@
 
     <div class="row m-0 py-4 justify-content-center">
         <div class="col-lg-auto text-center mb-2 mb-lg-0">
-            <img class="img-fluid rounded" src="{{item.poster}}" style="max-width:600px;max-height:600px;">
-            <p class="text-start"><small><img src="{{item.icon}}" width="16"> <a href="{{item.schema}}://{{item.host}}" target="_blank" class="text-decoration-none">{{item.host}}</small></a></p>
+            <img class="img-fluid rounded" src="{{item.poster_url}}" style="max-width:600px;max-height:600px;">
+            <p class="text-start"><small><img src="{{item.icon_url}}" width="16"> <a href="{{item.host}}" target="_blank" class="text-decoration-none">{{item.host}}</small></a></p>
         </div>
         <form method="POST" onsubmit="submitFormData(this);return false;" class="col-lg">
             {{ form.hidden_tag() }}
             {{ render_field(form.hash) }}
-            {{ render_field(form.poster) }}
-            {{ render_field(form.icon) }}
+            {{ render_field(form.poster_url) }}
+            {{ render_field(form.poster_path) }}
+            {{ render_field(form.icon_url) }}
+            {{ render_field(form.icon_path) }}
             {{ render_field(form.host) }}
-            {{ render_field(form.schema) }}
             {{ render_field(form.url) }}
 
             <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Title (editable)">
@@ -42,10 +43,10 @@
                 </div>
             </div>
 
-            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Actors">
+            <div class="input-group mb-2" data-bs-toggle="tooltip" data-bs-title="Models">
                 <span class="input-group-text"><i class="bi bi-people"></i></span>
                 <div id="actor-container" class="form-control">
-                    {{ render_field(form.actors) }}
+                    {{ render_field(form.models) }}
                 </div>
             </div>
 
@@ -89,14 +90,14 @@
         return elem
     }
 
-    var actors = document.getElementById('actors')
+    var model = document.getElementById('model')
     var actorContainer = document.getElementById('actor-container')
-    constructBadges(actors.value, actorContainer);
-    actors = clearInput(actors);
-    actors.addEventListener('input', function() {
+    constructBadges(model.value, actorContainer);
+    model = clearInput(model);
+    model.addEventListener('input', function() {
         if ( this.value.includes(',') ) {
             constructBadges(this.value, actorContainer);
-            actors = clearInput(actors);
+            model = clearInput(model);
         }
     })
 
@@ -127,7 +128,7 @@
         let tagValue = [...new Set(tagContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
         tags.value = tagValue;
         let actorValue = [...new Set(actorContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
-        actors.value = actorValue;
+        model.value = actorValue;
         let collectionValue = [...new Set(collectionContainer.innerText.split('\n').map( item => { if (item.trim().length > 0) { return item.trim() }; }))].sort() .join(',');
         collections.value = collectionValue;
 

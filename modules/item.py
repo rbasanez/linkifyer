@@ -21,7 +21,7 @@ class Item():
     poster = None
     schema = None
     tags = None
-    actors = None
+    model = None
     collections = None
     title = None
 
@@ -37,7 +37,7 @@ class Item():
         self.get_title()
         self.get_description()
         self.get_tags()
-        self.get_actors()
+        self.get_model()
         self.get_collections()
         self.get_poster()
         self.get_icon()
@@ -154,30 +154,32 @@ class Item():
         except Exception as err:
             logger.warning(f"{method_path(self.__class__.__name__)}: {err}")
 
-    def get_actors(self):
+    def get_model(self):
         try:
-            actors = []
+            model = []
             for actor in self._url_body.select('a[href*="/actor"]'):
-                actors.append( actor.text.strip().lower() )
+                model.append( actor.text.strip().lower() )
             for actor in self._url_body.select('[class*="pornstarsWrapper"] a[href*="/pornstar"]'):
-                actors.append( actor.text.strip().lower() )
-            for actor in self._url_body.select('[id="video-actors"] a'):
-                actors.append( actor.text.strip().lower() )
+                model.append( actor.text.strip().lower() )
+            for actor in self._url_body.select('[id="video-model"] a'):
+                model.append( actor.text.strip().lower() )
             for actor in self._url_body.select('[id="videotags"] a[class="studiolink1"]'):
-                actors.append( actor.text.strip().lower() )
+                model.append( actor.text.strip().lower() )
             for actor in self._url_body.select('[id="video-info-tags"] li[class="vit-pornstar starw"]'):
-                actors.append( actor.text.strip().lower() )
+                model.append( actor.text.strip().lower() )
             for actor in self._url_body.select('a[href*="/stars"][rel="tag"]'):
-                actors.append( actor.text.strip().lower() )
+                model.append( actor.text.strip().lower() )
             for actor in self._url_body.select('[id="tab_video_info"] [class="item"] a[href*="/models"]'):
-                actors.append( actor.text.strip().lower() )
-            if actors == []:
+                model.append( actor.text.strip().lower() )
+            for actor in self._url_body.select('[class="video-detail-list"] [class="video-pornstar-title"]'):
+                model.append( actor.text.strip().lower() )
+            if model == []:
                 for actor in self._url_body.select('[id="shareToStream"] [class*="usernameWrap"] [class="usernameBadgesWrapper"] a'):
-                    actors.append( actor.text.strip().lower() )
-            actors = sorted(set([ x for x in actors if len(x) > 1 and bool(re.search('actor|actors|model|suggest', x)) == False ]))
-            self.actors = ', '.join(actors)
-            logger.info(f"{method_path(self.__class__.__name__)}: {self.actors[:50]}...")
-            self.actors = self._to_string(self.actors)
+                    model.append( actor.text.strip().lower() )
+            model = sorted(set([ x for x in model if len(x) > 1 and bool(re.search('actor|model|model|suggest', x)) == False ]))
+            self.model = ', '.join(model)
+            logger.info(f"{method_path(self.__class__.__name__)}: {self.model[:50]}...")
+            self.model = self._to_string(self.model)
         except Exception as err:
             logger.warning(f"{method_path(self.__class__.__name__)}: {err}")
 
@@ -206,9 +208,9 @@ class Item():
         try:
             poster_url = self._select_first(self._url_head, 'meta[property*="image"]', 'content')
             poster_url = poster_url if poster_url else self._select_first(self._url_head, 'meta[name*="image"]', 'content')
-            parsed_url = urlparse(poster_url)
-            if not parsed_url.scheme:
-                poster_url = f'{self.schema}://{poster_url.lstrip("/")}'
+            # parsed_url = urlparse(poster_url)
+            # if not parsed_url.scheme:
+            #     poster_url = f'{self.schema}://{poster_url.lstrip("/")}'
             if self._url_check(poster_url) is None:
                 poster_url = f'{self.schema}://{self.host}/{poster_url.lstrip("/")}'
             response = requests.get(poster_url, stream=True)
@@ -226,12 +228,13 @@ class Item():
     def get_icon(self):
         try:
             icon_url = self._select_first(self._url_head, '[rel*="icon"]', 'href')
-            icon_parse = urlparse(icon_url)
-            if not icon_parse.scheme:
-                icon_url = f'{self.schema}://{icon_url.lstrip("/")}'
+            # icon_parse = urlparse(icon_url)
+            # if not icon_parse.scheme:
+            #     icon_url = f'{self.schema}://{icon_url.lstrip("/")}'
             if self._url_check(icon_url) is None:
                 icon_url = f'{self.schema}://{self.host}/{icon_url.lstrip("/")}'
             icon_url = icon_url.replace('\n', '').replace('\r', '')
+            logger.info(f"{method_path(self.__class__.__name__)}: {icon_url}")
             response = requests.get(icon_url, stream=True)
             response.raise_for_status()
             self.icon = icon_url
